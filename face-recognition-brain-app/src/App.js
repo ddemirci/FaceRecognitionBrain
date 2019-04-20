@@ -6,6 +6,8 @@ import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Particles from 'react-particles-js'
 import Rank from './components/Rank/Rank';
+import SignIn from './components/SignIn/SignIn';
+import Register from './components/Register/Register';
 
 import './App.css';
 
@@ -32,7 +34,9 @@ class App extends Component {
     this.state ={
       input:'',
       imageUrl:'',
-      box:{}
+      box:{},
+      route:'signin',
+      isSignedIn: false
     }
   }
 
@@ -50,7 +54,6 @@ calculateFaceLocation = (data) =>{
 }
 
 displayFaceBox = (box) =>{
-  console.log(box);
   this.setState({box: box})
 }
 
@@ -66,17 +69,33 @@ displayFaceBox = (box) =>{
       .catch(err => console.log(err));
  }
 
+ onRouteChange = (route) =>{
+    if(route === 'signout'){
+        this.setState({isSignedIn: false});
+      }else if(route === 'home'){
+        this.setState({isSignedIn: true});
+      }
+    this.setState({route: route});
+}
   render() {
+    const {isSignedIn, route, imageUrl, box} = this.state;
     return (
       <div className="App">
       <Particles className='particles'
               params={particlesOptions}
             />
-        <Navigation />
-        <Logo />
-        <Rank />
-        <ImageLinkForm onInputChange={this.onInputChanged} onButtonSubmit={this.onButtonSubmitted}/>
-        <FaceRecoginiton box={this.state.box} imageUrl={this.state.imageUrl} />
+        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        { route === 'home'
+          ? <div>
+              <Logo />
+              <Rank />
+              <ImageLinkForm onInputChange={this.onInputChanged} onButtonSubmit={this.onButtonSubmitted}/>
+              <FaceRecoginiton box={box} imageUrl={this.state.imageUrl} />
+           </div>
+          :(route === 'signin')
+            ? <SignIn onRouteChange={this.onRouteChange} />
+            : <Register onRouteChange={this.onRouteChange} />
+        }
       </div>
     );
   }
